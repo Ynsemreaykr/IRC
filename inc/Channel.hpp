@@ -6,18 +6,25 @@
 
 class Client;
 
+/**
+ * @brief IRC Kanalını temsil eden sınıf.
+ * 
+ * Bu sınıf, kanalın adını, konusunu, anahtarını (şifre), üyelerini,
+ * operatörlerini ve davetli listesini yönetir. Ayrıca kanal modlarını
+ * (davet usulü, konu kilidi, kullanıcı limiti) saklar.
+ */
 class Channel
 {
 private:
-	std::string		_name;
-	std::string		_topic;
-	std::string		_key;
-	std::set<int>	_members;
-	std::set<int>	_operators;
-	std::set<int>	_invited;
-	bool			_inviteOnly;
-	bool			_topicLock;
-	int				_userLimit;
+	std::string		_name;        // Kanalın adı (örn: #genel)
+	std::string		_topic;       // Kanalın konusu
+	std::string		_key;         // Kanala giriş anahtarı (şifre)
+	std::set<int>	_members;     // Kanaldaki üyelerin dosya tanımlayıcıları (fd)
+	std::set<int>	_operators;   // Kanal operatörlerinin fd listesi
+	std::set<int>	_invited;     // Kanala davet edilen kullanıcıların fd listesi
+	bool			_inviteOnly;  // Sadece davetle girilebilir modu (+i)
+	bool			_topicLock;   // Konuyu sadece operatörler değiştirebilir modu (+t)
+	int				_userLimit;   // Kanalın maksimum kullanıcı sınırı (+l)
 
 public:
 	Channel();
@@ -26,38 +33,44 @@ public:
 	Channel &operator=(const Channel &other);
 	~Channel();
 
-	const std::string		&getName() const;
-	const std::string		&getTopic() const;
-	const std::string		&getKey() const;
-	bool					isInviteOnly() const;
-	bool					isTopicLocked() const;
-	int						getUserLimit() const;
-	const std::set<int>		&getMembers() const;
-	const std::set<int>		&getOperators() const;
+	// Getter metodları
+	const std::string		&getName() const;     // Kanal adını döndürür
+	const std::string		&getTopic() const;    // Kanal konusunu döndürür
+	const std::string		&getKey() const;      // Kanal şifresini döndürür
+	bool					isInviteOnly() const; // Davet modu aktif mi?
+	bool					isTopicLocked() const;// Konu kilitli mi?
+	int						getUserLimit() const; // Kullanıcı limitini döndürür
+	const std::set<int>		&getMembers() const;  // Üyelerin listesini döndürür
+	const std::set<int>		&getOperators() const;// Operatörlerin listesini döndürür
 
-	void					setTopic(const std::string &topic);
-	void					setKey(const std::string &key);
-	void					setInviteOnly(bool value);
-	void					setTopicLock(bool value);
-	void					setUserLimit(int limit);
+	// Setter metodları
+	void					setTopic(const std::string &topic); // Kanal konusunu ayarlar
+	void					setKey(const std::string &key);     // Kanal şifresini ayarlar
+	void					setInviteOnly(bool value);          // Davet modunu ayarlar
+	void					setTopicLock(bool value);           // Konu kilidini ayarlar
+	void					setUserLimit(int limit);            // Kullanıcı limitini ayarlar
 
-	bool					isMember(int fd) const;
-	bool					isOperator(int fd) const;
-	bool					isInvited(int fd) const;
-	bool					isEmpty() const;
-	int						memberCount() const;
+	// Durum kontrol metodları
+	bool					isMember(int fd) const;   // Kullanıcı üye mi?
+	bool					isOperator(int fd) const; // Kullanıcı operatör mü?
+	bool					isInvited(int fd) const;  // Kullanıcı davetli mi?
+	bool					isEmpty() const;          // Kanal boş mu?
+	int						memberCount() const;      // Üye sayısını döndürür
 
-	void					addMember(int fd);
-	void					removeMember(int fd);
-	void					addOperator(int fd);
-	void					removeOperator(int fd);
-	void					addInvited(int fd);
-	void					removeInvited(int fd);
+	// Üye yönetimi
+	void					addMember(int fd);    // Kanala üye ekler
+	void					removeMember(int fd); // Kanaldan üye çıkarır
+	void					addOperator(int fd);  // Kanala operatör atar
+	void					removeOperator(int fd);// Operatör yetkisini alır
+	void					addInvited(int fd);   // Davetli listesine ekler
+	void					removeInvited(int fd);// Davetli listesinden çıkarır
 
-	void					broadcast(const std::string &message, int excludeFd) const;
-	void					broadcastAll(const std::string &message) const;
+	// Mesaj iletimi
+	void					broadcast(const std::string &message, int excludeFd) const; // Belirli biri hariç herkese mesaj gönderir
+	void					broadcastAll(const std::string &message) const;             // Kanalın tamamına mesaj gönderir
 
-	std::string				getModeString() const;
+	// Yardımcı metodlar
+	std::string				getModeString() const; // Kanalın modlarını string olarak döndürür
 };
 
 #endif

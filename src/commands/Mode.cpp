@@ -3,6 +3,9 @@
 #include "Reply.hpp"
 #include <sstream>
 
+/**
+ * @brief Kanalın davet modunu (+i) ayarlar.
+ */
 static void	handleModeI(Channel &channel, Client &client, bool enable,
 						std::string &applied, std::string &appliedParams)
 {
@@ -17,6 +20,9 @@ static void	handleModeI(Channel &channel, Client &client, bool enable,
 	applied += (enable ? "+i" : "-i");
 }
 
+/**
+ * @brief Kanalın konu kilidi modunu (+t) ayarlar.
+ */
 static void	handleModeT(Channel &channel, Client &client, bool enable,
 						std::string &applied, std::string &appliedParams)
 {
@@ -31,6 +37,9 @@ static void	handleModeT(Channel &channel, Client &client, bool enable,
 	applied += (enable ? "+t" : "-t");
 }
 
+/**
+ * @brief Kanalın şifre modunu (+k) ayarlar.
+ */
 static void	handleModeK(Channel &channel, Client &client, bool enable,
 						std::vector<std::string> &params, size_t &paramIdx,
 						std::string &applied, std::string &appliedParams)
@@ -60,6 +69,9 @@ static void	handleModeK(Channel &channel, Client &client, bool enable,
 	}
 }
 
+/**
+ * @brief Kanal operatörü atama veya yetki alma işlemini (+o/-o) yapar.
+ */
 static void	handleModeO(Server &server, Channel &channel, Client &client,
 						bool enable, std::vector<std::string> &params,
 						size_t &paramIdx, std::string &applied,
@@ -97,6 +109,9 @@ static void	handleModeO(Server &server, Channel &channel, Client &client,
 	appliedParams += " " + targetNick;
 }
 
+/**
+ * @brief Kanal kullanıcı limiti modunu (+l) ayarlar.
+ */
 static void	handleModeL(Channel &channel, Client &client, bool enable,
 						std::vector<std::string> &params, size_t &paramIdx,
 						std::string &applied, std::string &appliedParams)
@@ -133,6 +148,9 @@ static void	handleModeL(Channel &channel, Client &client, bool enable,
 	}
 }
 
+/**
+ * @brief Mod stringini optimize eder (Örn: +i+t-k -> +it-k).
+ */
 static std::string	collapseModeString(const std::string &modes)
 {
 	std::string result;
@@ -156,16 +174,25 @@ static std::string	collapseModeString(const std::string &modes)
 	return result;
 }
 
+/**
+ * @brief MODE komutunu işler.
+ * 
+ * Kanal modlarını (i, t, k, o, l) görüntülemek veya değiştirmek için kullanılır.
+ * 
+ * Kullanım: MODE <kanal> [<modlar> [<parametreler>]]
+ */
 void	cmdMode(Server &server, Client &client, std::vector<std::string> &params)
 {
 	std::string nick = client.getNickname();
 
+	// Kayıt kontrolü
 	if (!client.isRegistered())
 	{
 		client.sendReply(Reply::err_notregistered(nick.empty() ? "*" : nick));
 		return ;
 	}
 
+	// Parametre kontrolü
 	if (params.empty())
 	{
 		client.sendReply(Reply::err_needmoreparams(nick, "MODE"));
@@ -174,6 +201,7 @@ void	cmdMode(Server &server, Client &client, std::vector<std::string> &params)
 
 	std::string target = params[0];
 
+	// Sadece kanal modlarını destekliyoruz
 	if (target[0] != '#')
 		return ;
 
@@ -184,6 +212,7 @@ void	cmdMode(Server &server, Client &client, std::vector<std::string> &params)
 		return ;
 	}
 
+	// Parametre yoksa mevcut modları göster
 	if (params.size() == 1)
 	{
 		std::string modes = channel->getModeString();
@@ -201,6 +230,7 @@ void	cmdMode(Server &server, Client &client, std::vector<std::string> &params)
 		return ;
 	}
 
+	// Kanallarda mod değiştirmek için kanalda olmak gerekir
 	if (!channel->isMember(client.getFd()))
 	{
 		client.sendReply(Reply::err_notonchannel(nick, target));
@@ -215,6 +245,7 @@ void	cmdMode(Server &server, Client &client, std::vector<std::string> &params)
 	std::string applied;
 	std::string appliedParams;
 
+	// Mod karakterlerini tek tek işle
 	for (size_t i = 0; i < modeStr.size(); ++i)
 	{
 		char c = modeStr[i];
@@ -256,6 +287,7 @@ void	cmdMode(Server &server, Client &client, std::vector<std::string> &params)
 		}
 	}
 
+	// Değişiklik yapıldıysa tüm kanala duyur
 	if (!applied.empty())
 	{
 		std::string modeMsg = ":" + client.getPrefix() + " MODE " + target +
