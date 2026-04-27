@@ -20,11 +20,35 @@ Sunucu bir port numarası ve bağlantı şifresi ile çalışır:
 ```
 *Örnek:* `./ircserv 6667 sifre123`
 
-### Bağlantı Kurma
-Sunucuya herhangi bir IRC istemcisi (Irssi, HexChat, mIRC) veya `nc` (netcat) ile bağlanabilirsiniz:
+## 🌐 Bağlantı Seçenekleri ve Dış Erişim
+
+Sunucuya hem yerel ağdan hem de farklı bilgisayarlardan bağlanabilirsiniz.
+
+### 1. Yerel Bağlantı (Aynı Bilgisayar)
+Kendi bilgisayarınızdan test etmek için:
+- **Terminal (nc):** `nc localhost 6667`
+- **HexChat / Irssi:** Sunucu adresi olarak `127.0.0.1` veya `localhost` kullanın.
+
+### 2. Dış Bağlantı (Başka Bilgisayardan Bağlanma)
+Başka bir bilgisayardan sizin sunucunuza bağlanmak için şu adımları izleyin:
+1.  **IP Adresinizi Öğrenin:** Terminale `ipconfig` (Windows) veya `ifconfig` (Linux/Mac) yazarak yerel IP adresinizi (örn: `192.168.1.50`) bulun.
+2.  **Bağlantı Kurma:** Diğer bilgisayardaki istemciye sizin IP adresinizi ve portunuzu girin.
+    - *Örnek:* `nc 192.168.1.50 6667`
+3.  **Güvenlik Duvarı:** Eğer bağlantı kurulamazsa, bilgisayarınızın güvenlik duvarının (Firewall) seçtiğiniz porta izin verdiğinden emin olun.
+
+### 3. HexChat ile Bağlanma (Görsel Arayüz)
+HexChat gibi modern IRC istemcilerini kullanmak çok daha kolaydır. Eğer yüklü değilse (Linux için):
 ```bash
-nc localhost 6667
+sudo apt install hexchat
 ```
+Yükledikten sonra terminale `hexchat` yazarak uygulamayı başlatabilirsiniz.
+
+**Bağlantı Adımları:**
+1.  HexChat'i açın ve **Network List** (Ağ Listesi) ekranında **Add** diyerek yeni bir ağ ekleyin (örn: "BenimIRC").
+2.  **Edit** butonuna basın ve sunucu adresi kısmına kendi IP'nizi ve portunuzu yazın (örn: `192.168.1.50/6667`).
+3.  **Password** kısmına sunucuyu başlatırken belirlediğiniz şifreyi girin.
+4.  **Connect** dediğinizde sunucuya bağlanmış olacaksınız.
+
 
 ---
 
